@@ -6,8 +6,10 @@ class MovieController extends Controller {
     async index() {
         const { ctx } = this;
         const { doubanId } = ctx.request.query;
-        let movie_detail_url = await this.service.common.get_movie_detail_url(doubanId);
-        ctx.body = context;
+        let url = await this.service.movie.get_movie_detail_url(doubanId);
+        let html = await this.service.common.get_html(url);
+        let res = await this.service.movie.get_movie_detail(html);
+        ctx.body = res;
     }
 }
 
