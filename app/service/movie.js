@@ -32,6 +32,20 @@ class MovieService extends Service {
             intro
         }
     }
+    // Format
+    async format_movie_detail(movieDetail, actorsSize) {
+        let movieDetail_format = movieDetail;
+        let { actors, intro } = movieDetail;
+        if (!actorsSize) actorsSize = 5;
+        actors = actors.split('/');
+        actors = actors.slice(0, actorsSize);
+        actors = actors.join('/');
+        movieDetail_format.actors = actors;
+        intro = intro.replace(/\n/g, '');
+        intro = intro.replace(/(^\s*)|(\s*$)/g, '');
+        movieDetail_format.intro = intro;
+        return movieDetail_format;
+    }
     // Parse title
     async parse_title(cheerioModel) {
         const title = cheerioModel('#content').find('h1').find('span')[0].children[0].data;
