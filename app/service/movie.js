@@ -14,22 +14,39 @@ class MovieService extends Service {
     async get_movie_detail(html) {
         const cheerioModel = cheerio.load(html);
         // Parse Banner Info
+        const title = await this.service.movie.parse_title(cheerioModel);
+        // Parse Image
+        const image = await this.service.movie.parse_image(cheerioModel);
         // Parse Media Info
         const mediaInfo = cheerioModel('#info')[0];
-        await this.service.movie.parse_media_info_index(cheerioModel);
-        // const directors = await this.service.movie.parse_directors(mediaInfo);
-        // const actors = await this.service.movie.parse_actors(mediaInfo);
+        const { directorsIndex, actorsIndex } = await this.service.movie.parse_media_info_index(mediaInfo);
+        const directors = await this.service.movie.parse_directors(mediaInfo, directorsIndex);
+        const actors = await this.service.movie.parse_actors(mediaInfo, actorsIndex);
+        // Parse Intro
+        const intro = await this.service.movie.parse_intro(cheerioModel);
         return {
-            // directors,
-            // actors,
+            title,
+            image,
+            directors,
+            actors,
+            intro
         }
     }
-
+    // Parse title
+    async parse_title(cheerioModel) {
+        const title = cheerioModel('#content').find('h1').find('span')[0].children[0].data;
+        return title;
+    }
+    // Parse Image
+    async parse_image(cheerioModel) {
+        const image = cheerioModel('#mainpic').find('img')[0].attribs.src;
+        console.log(image)
+        return image;
+    }
     // Parse directors、Actors、genre... span index
-    async parse_media_info_index(cheerioModel) {
+    async parse_media_info_index(mediaInfo) {
         let directorsIndex = null, scenaristsIndex = null, actorsIndex = null;
         let genreIndex = []
-        const mediaInfo = cheerioModel('#info')[0];
         for (let index = 0; index < mediaInfo.children.length; index++) {
             const element = mediaInfo.children[index];
             if (element.type == 'tag' && element.name == 'span') {
@@ -39,37 +56,32 @@ class MovieService extends Service {
                         directorsIndex = index;
                     } else if (element.children[0].children[0].data == '编剧') {
                         scenaristsIndex = index;
-                    } else if (element.attribs.class == 'actor') {
-                        actorsIndex = index;
                     }
 
                 } catch (error) { }
                 // search for genre index array
                 try {
-                    if (element.attribs.property) {
+                    if (element.attribs.class == 'actor') {
+                        actorsIndex = index;
+                    } else if (element.attribs.property == 'v:genre') {
                         genreIndex.push(index);
-                        console.log(index)
                     }
                 } catch (error) { }
-
-                // console.log(element.attribs.property)
             }
         }
-
         return {
             directorsIndex,
+            scenaristsIndex,
             actorsIndex,
+            genreIndex
         }
     }
 
-    async parse_directors(mediaInfo) {
+    async parse_directors(mediaInfo, directorsIndex) {
         let directors = '';
         let span_list = null;
-        try {
-            span_list = mediaInfo.children[1].children[2].children;
-        } catch (error) {
-            this.logger.error(error);
-        }
+        if (!directorsIndex) return directors;
+        span_list = mediaInfo.children[directorsIndex].children[2].children;
         if (!span_list) return directors;
         span_list.forEach(span => {
             if (span.type == 'tag') {
@@ -82,14 +94,11 @@ class MovieService extends Service {
         return directors;
     }
 
-    async parse_actors(mediaInfo) {
+    async parse_actors(mediaInfo, actorsIndex) {
         let actors = '';
         let span_list = null;
-        try {
-            span_list = mediaInfo.children[7].children[2].children;
-        } catch (error) {
-            this.logger.error(error);
-        }
+        if (!actorsIndex) return actors;
+        span_list = mediaInfo.children[actorsIndex].children[2].children;
         if (!span_list) return actors;
         span_list.forEach(span => {
             if (span.type == 'tag') {
@@ -102,8 +111,10 @@ class MovieService extends Service {
         return actors;
     }
 
-    async parse_genre(mediaInfo) {
-
+    // Parse Intro
+    async parse_intro(cheerioModel) {
+        const intro = cheerioModel('#content').find('span[property="v:summary"]')[0].children[0].data;
+        return intro;
     }
 }
 
