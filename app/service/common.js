@@ -10,12 +10,16 @@ dotenv.config()
 const minioClient = new Minio.Client({
     endPoint: process.env.MINIO_ENDPOINT, // 替换 minio 的访问地址
     port: parseInt(process.env.MINIO_PORT),
-    useSSL: process.env.USESSL,
-    accessKey: process.env.ACCESSKEY, // 替换 accessKey
-    secretKey: process.env.SECRETKEY// 替换 secretKey
+    useSSL: true,
+    accessKey: process.env.MINIO_ACCESSKEY, // 替换 accessKey
+    secretKey: process.env.MINIO_SECRETKEY// 替换 secretKey
 });
 
 class CommonService extends Service {
+
+    async tokenValidate(token) {
+        return token === process.env.TOKEN ? true : false;
+    }
 
     async get_html(url) {
         const { ctx } = this;
