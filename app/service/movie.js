@@ -16,7 +16,8 @@ class MovieService extends Service {
         // Parse Banner Info
         const title = await this.service.movie.parse_title(cheerioModel);
         // Parse Image
-        const image = await this.service.movie.parse_image(cheerioModel);
+        let image = await this.service.movie.parse_image(cheerioModel);
+        image = await this.service.common.upload_img(image);
         // Parse Media Info
         const mediaInfo = cheerioModel('#info')[0];
         const { directorsIndex, actorsIndex } = await this.service.movie.parse_media_info_index(mediaInfo);
@@ -54,7 +55,6 @@ class MovieService extends Service {
     // Parse Image
     async parse_image(cheerioModel) {
         const image = cheerioModel('#mainpic').find('img')[0].attribs.src;
-        console.log(image)
         return image;
     }
     // Parse directors、Actors、genre... span index
