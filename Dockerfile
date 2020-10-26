@@ -9,4 +9,4 @@ COPY . /home/Service
 RUN npm install
 
 EXPOSE 7001
-CMD [ "npm", "dev" ]
+CMD [ "npm", "run" ,"dev" ]
