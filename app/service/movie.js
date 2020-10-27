@@ -24,8 +24,8 @@ class MovieService extends Service {
         const { directorsIndex, actorsIndex, aliasIndex } = await this.service.movie.parse_media_info_index(mediaInfo);
         const directors = await this.service.movie.parse_directors(mediaInfo, directorsIndex);
         const actors = await this.service.movie.parse_actors(mediaInfo, actorsIndex);
-        // Parse aliasname
-
+        // Parse aliases
+        const aliases = await this.service.movie.parse_aliases(mediaInfo, aliasIndex);
         // Parse Intro
         const intro = await this.service.movie.parse_intro(cheerioModel);
 
@@ -35,8 +35,20 @@ class MovieService extends Service {
             image,
             directors,
             actors,
+            aliases,
             intro
         }
+    }
+    async get_movie_score(html, url) {
+        const cheerioModel = cheerio.load(html);
+        const score = cheerioModel('#interest_sectl').find('strong')[0].children[0].data;
+        const commentUrl = url + 'comments' + '';
+        console.log(commentUrl)
+        const scoreInfo = {
+            score,
+            commentUrl
+        }
+        return scoreInfo;
     }
     // Format
     async format_movie_detail(movieDetail, actorsSize) {
@@ -135,9 +147,15 @@ class MovieService extends Service {
         });
         return actors;
     }
-    // Parse aliasname
-    async parse_aliasname(mediaInfo, aliasIndex) {
-
+    // Parse aliases
+    async parse_aliases(mediaInfo, aliasIndex) {
+        let aliases = '';
+        let alias_span = null;
+        if (!aliasIndex) return aliases;
+        alias_span = mediaInfo.children[aliasIndex];
+        if (!alias_span) return aliases;
+        if (alias_span.next.type == 'text') aliases = alias_span.next.data;
+        return aliases;
     }
     // Parse Intro
     async parse_intro(cheerioModel) {
