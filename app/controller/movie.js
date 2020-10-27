@@ -16,6 +16,7 @@ class MovieController extends Controller {
             let movieDetail = await this.service.movie.get_movie_detail(html);
             movieDetail = await this.service.movie.format_movie_detail(movieDetail, actorSize);
             let res = {
+                msg: "获取信息成功！",
                 doubanId,
                 url,
                 movieDetail,

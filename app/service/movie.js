@@ -20,11 +20,16 @@ class MovieService extends Service {
         image = await this.service.common.upload_img(image);
         // Parse Media Info
         const mediaInfo = cheerioModel('#info')[0];
-        const { directorsIndex, actorsIndex } = await this.service.movie.parse_media_info_index(mediaInfo);
+        // Parse Intro
+        const { directorsIndex, actorsIndex, aliasIndex } = await this.service.movie.parse_media_info_index(mediaInfo);
         const directors = await this.service.movie.parse_directors(mediaInfo, directorsIndex);
         const actors = await this.service.movie.parse_actors(mediaInfo, actorsIndex);
+        // Parse aliasname
+
         // Parse Intro
         const intro = await this.service.movie.parse_intro(cheerioModel);
+
+        // Parse Score
         return {
             title,
             image,
@@ -59,12 +64,12 @@ class MovieService extends Service {
     }
     // Parse directors、Actors、genre... span index
     async parse_media_info_index(mediaInfo) {
-        let directorsIndex = null, scenaristsIndex = null, actorsIndex = null;
+        let directorsIndex = null, scenaristsIndex = null, actorsIndex = null, aliasIndex = null;
         let genreIndex = []
         for (let index = 0; index < mediaInfo.children.length; index++) {
             const element = mediaInfo.children[index];
             if (element.type == 'tag' && element.name == 'span') {
-                // search for director index
+                // Try TypeA
                 try {
                     if (element.children[0].children[0].data == '导演') {
                         directorsIndex = index;
@@ -73,7 +78,12 @@ class MovieService extends Service {
                     }
 
                 } catch (error) { }
-                // search for genre index array
+                // Try TypeB
+                try {
+                    if (element.children[0].type == 'text' && element.children[0].data == '又名:') aliasIndex = index;
+                } catch (error) { }
+
+                // Try TypeC
                 try {
                     if (element.attribs.class == 'actor') {
                         actorsIndex = index;
@@ -87,7 +97,8 @@ class MovieService extends Service {
             directorsIndex,
             scenaristsIndex,
             actorsIndex,
-            genreIndex
+            genreIndex,
+            aliasIndex
         }
     }
 
@@ -124,12 +135,21 @@ class MovieService extends Service {
         });
         return actors;
     }
+    // Parse aliasname
+    async parse_aliasname(mediaInfo, aliasIndex) {
 
+    }
     // Parse Intro
     async parse_intro(cheerioModel) {
-        const intro = cheerioModel('#content').find('span[property="v:summary"]')[0].children[0].data;
+        const intro_span = cheerioModel('#content').find('span[property="v:summary"]')[0];
+        let intro = "";
+        intro_span.children.forEach(element => {
+            if (element.type == 'text') intro += element.data;
+            else if (element.type == 'tag' && element.name == 'br') intro += '\n';
+        })
         return intro;
     }
+
 }
 
 module.exports = MovieService;
