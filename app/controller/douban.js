@@ -2,7 +2,7 @@
 
 const Controller = require('egg').Controller;
 
-class MovieController extends Controller {
+class DoubanController extends Controller {
     async index() {
         const { ctx } = this;
         const { doubanId, actorSize, token } = ctx.request.query;
@@ -28,4 +28,4 @@ class MovieController extends Controller {
     }
 }
 
-module.exports = MovieController;
+module.exports = DoubanController;

@@ -7,5 +7,5 @@
 module.exports = app => {
   const { router, controller } = app;
   router.get('/', controller.home.index);
-  router.get('/movie', controller.movie.index);
+  router.get('/douban', controller.douban.index);
 };
