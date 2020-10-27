@@ -42,11 +42,10 @@ class MovieService extends Service {
     async get_movie_score(html, url) {
         const cheerioModel = cheerio.load(html);
         const score = cheerioModel('#interest_sectl').find('strong')[0].children[0].data;
-        const commentUrl = url + 'comments' + '';
-        console.log(commentUrl)
+        const commentsUrl = url + 'comments' + '/';
         const scoreInfo = {
             score,
-            commentUrl
+            commentsUrl
         }
         return scoreInfo;
     }
