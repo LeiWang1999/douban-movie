@@ -6,6 +6,7 @@ WORKDIR /home/Service
 
 # Bundle app source
 COPY . /home/Service
+RUN npm config set registry https://registry.npm.taobao.org
 RUN npm install
 
 EXPOSE 7001
