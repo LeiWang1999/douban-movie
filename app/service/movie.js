@@ -43,8 +43,11 @@ class MovieService extends Service {
         const cheerioModel = cheerio.load(html);
         const score = cheerioModel('#interest_sectl').find('strong')[0].children[0].data;
         const commentsUrl = url + 'comments' + '/';
+        const commentCount = cheerioModel('span[property="v:votes"]')[0].children[0].data;
+        console.log(commentCount)
         const scoreInfo = {
             score,
+            commentCount,
             commentsUrl
         }
         return scoreInfo;

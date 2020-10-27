@@ -13,15 +13,15 @@ class MovieController extends Controller {
         else {
             let url = await this.service.movie.get_movie_detail_url(doubanId);
             let html = await this.service.common.get_html(url);
+            let scoreInfo = await this.service.movie.get_movie_score(html, url);
             let movieDetail = await this.service.movie.get_movie_detail(html);
             movieDetail = await this.service.movie.format_movie_detail(movieDetail, actorSize);
-            let scoreInfo = await this.service.movie.get_movie_score(html, url);
             let res = {
                 msg: "获取信息成功！",
                 doubanId,
                 url,
-                movieDetail,
-                scoreInfo
+                scoreInfo,
+                movieDetail
             }
             ctx.body = res;
         }
