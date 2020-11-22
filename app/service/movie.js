@@ -66,6 +66,7 @@ class MovieService extends Service {
         movieDetail_format.actors = actors;
         intro = intro.replace(/\n/g, '');
         intro = intro.replace(/(^\s*)|(\s*$)/g, '');
+        intro = intro.replace(/(^\s+)|(\s+$)|\s+/g, '');
         movieDetail_format.intro = intro;
         return movieDetail_format;
     }
