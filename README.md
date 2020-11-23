@@ -1,6 +1,6 @@
 # douban-movie
 
-douban movie information spyder
+douban movie information crawler
 
 ## QuickStart
 
