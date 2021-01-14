@@ -41,14 +41,18 @@ class MovieService extends Service {
     }
     async get_movie_score(html, url) {
         const cheerioModel = cheerio.load(html);
-        let score = null, commentCount = null;
-        const scorespan = cheerioModel('#interest_sectl').find('strong')[0].children[0];
-        if (scorespan) {
-            score = scorespan.data;
-            commentCount = cheerioModel('span[property="v:votes"]')[0].children[0].data;
+        let score = null, commentCount = null, scoreInfo = '', commentsUrl = '';
+        try {
+            const scorespan = cheerioModel('#interest_sectl').find('strong')[0].children[0];
+            if (scorespan) {
+                score = scorespan.data;
+                commentCount = cheerioModel('span[property="v:votes"]')[0].children[0].data;
+            }
+            commentsUrl = url + 'comments' + '/';
+
+        } catch (error) {
         }
-        const commentsUrl = url + 'comments' + '/';
-        const scoreInfo = {
+        scoreInfo = {
             score,
             commentCount,
             commentsUrl
@@ -72,45 +76,60 @@ class MovieService extends Service {
     }
     // Parse title
     async parse_title(cheerioModel) {
-        const title = cheerioModel('#content').find('h1').find('span')[0].children[0].data;
+        let title = '';
+        try {
+            title = cheerioModel('#content').find('h1').find('span')[0].children[0].data;
+        } catch (error) {
+
+        }
         return title;
     }
     // Parse Image
     async parse_image(cheerioModel) {
-        const image = cheerioModel('#mainpic').find('img')[0].attribs.src;
+        let image = '';
+        try {
+            image = cheerioModel('#mainpic').find('img')[0].attribs.src;
+        } catch (error) {
+
+        }
         return image;
     }
     // Parse directors、Actors、genre... span index
     async parse_media_info_index(mediaInfo) {
         let directorsIndex = null, scenaristsIndex = null, actorsIndex = null, aliasIndex = null;
         let genreIndex = []
-        for (let index = 0; index < mediaInfo.children.length; index++) {
-            const element = mediaInfo.children[index];
-            if (element.type == 'tag' && element.name == 'span') {
-                // Try TypeA
-                try {
-                    if (element.children[0].children[0].data == '导演') {
-                        directorsIndex = index;
-                    } else if (element.children[0].children[0].data == '编剧') {
-                        scenaristsIndex = index;
-                    }
+        try {
+            for (let index = 0; index < mediaInfo.children.length; index++) {
+                const element = mediaInfo.children[index];
+                if (element.type == 'tag' && element.name == 'span') {
+                    // Try TypeA
+                    try {
+                        if (element.children[0].children[0].data == '导演') {
+                            directorsIndex = index;
+                        } else if (element.children[0].children[0].data == '编剧') {
+                            scenaristsIndex = index;
+                        }
 
-                } catch (error) { }
-                // Try TypeB
-                try {
-                    if (element.children[0].type == 'text' && element.children[0].data == '又名:') aliasIndex = index;
-                } catch (error) { }
+                    } catch (error) { }
+                    // Try TypeB
+                    try {
+                        if (element.children[0].type == 'text' && element.children[0].data == '又名:') aliasIndex = index;
+                    } catch (error) { }
 
-                // Try TypeC
-                try {
-                    if (element.attribs.class == 'actor') {
-                        actorsIndex = index;
-                    } else if (element.attribs.property == 'v:genre') {
-                        genreIndex.push(index);
-                    }
-                } catch (error) { }
+                    // Try TypeC
+                    try {
+                        if (element.attribs.class == 'actor') {
+                            actorsIndex = index;
+                        } else if (element.attribs.property == 'v:genre') {
+                            genreIndex.push(index);
+                        }
+                    } catch (error) { }
+                }
             }
+        } catch (error) {
+
         }
+
         return {
             directorsIndex,
             scenaristsIndex,
@@ -165,12 +184,16 @@ class MovieService extends Service {
     }
     // Parse Intro
     async parse_intro(cheerioModel) {
-        const intro_span = cheerioModel('#content').find('span[property="v:summary"]')[0];
-        let intro = "";
-        intro_span.children.forEach(element => {
-            if (element.type == 'text') intro += element.data;
-            else if (element.type == 'tag' && element.name == 'br') intro += '\n';
-        })
+        let intro = '';
+        try {
+            const intro_span = cheerioModel('#content').find('span[property="v:summary"]')[0];
+            intro_span.children.forEach(element => {
+                if (element.type == 'text') intro += element.data;
+                else if (element.type == 'tag' && element.name == 'br') intro += '\n';
+            })
+        } catch (error) {
+
+        }
         return intro;
     }
 

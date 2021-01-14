@@ -9,15 +9,14 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "dotenv": "^8.2.0",
-    "egg": "^2.15.1",
-    "egg-bin": "^4.15.0",
+    "egg": "^2.29.1",
     "egg-scripts": "^2.11.0",
     "minio": "^7.0.16"
   },
   "devDependencies": {
     "autod": "^3.0.1",
     "autod-egg": "^1.1.0",
-    "egg-bin": "^4.11.0",
+    "egg-bin": "^4.15.0",
     "egg-ci": "^1.11.0",
     "egg-mock": "^3.21.0",
     "eslint": "^5.13.0",
