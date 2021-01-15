@@ -11,13 +11,15 @@ class MovieService extends Service {
         return movie_detail_url + doubanId + '/';
     };
 
-    async get_movie_detail(html) {
+    async get_movie_detail(html, imageUpload) {
         const cheerioModel = cheerio.load(html);
         // Parse Banner Info
         const title = await this.service.movie.parse_title(cheerioModel);
         // Parse Image
         let image = await this.service.movie.parse_image(cheerioModel);
-        image = await this.service.common.upload_img(image);
+        if (imageUpload == 'minio') {
+            image = await this.service.common.upload_img(image);
+        }
         // Parse Media Info
         const mediaInfo = cheerioModel('#info')[0];
         // Parse Intro
