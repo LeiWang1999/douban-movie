@@ -32,6 +32,7 @@ class CommonService extends Service {
         }
         let options = {
             headers,
+            timeout: 20000
         }
         let res = await ctx.curl(url, options);
         const resultHtml = res.data.toString();
