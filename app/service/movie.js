@@ -22,7 +22,6 @@ class MovieService extends Service {
         }
         // Parse Year
         const year = await this.service.movie.parse_year(cheerioModel);
-        console.log(year)
         // Parse Media Info
         const mediaInfo = cheerioModel('#info')[0];
         // Parse Intro
