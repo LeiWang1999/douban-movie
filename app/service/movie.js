@@ -20,6 +20,9 @@ class MovieService extends Service {
         if (imageUpload == 'minio') {
             image = await this.service.common.upload_img(image);
         }
+        // Parse Year
+        const year = await this.service.movie.parse_year(cheerioModel);
+        console.log(year)
         // Parse Media Info
         const mediaInfo = cheerioModel('#info')[0];
         // Parse Intro
@@ -34,6 +37,7 @@ class MovieService extends Service {
         // Parse Score
         return {
             title,
+            year,
             image,
             directors,
             actors,
@@ -64,8 +68,10 @@ class MovieService extends Service {
     // Format
     async format_movie_detail(movieDetail, actorsSize) {
         let movieDetail_format = movieDetail;
-        let { actors, intro } = movieDetail;
+        let { actors, intro, year } = movieDetail;
         if (!actorsSize) actorsSize = 5;
+        year = year.replace(/[()]/g, '');
+        movieDetail_format.year = parseInt(year);
         actors = actors.split('/');
         actors = actors.slice(0, actorsSize);
         actors = actors.join('/');
@@ -85,6 +91,16 @@ class MovieService extends Service {
 
         }
         return title;
+    }
+    // Parse year
+    async parse_year(cheerioModel) {
+        let year = '';
+        try {
+            year = cheerioModel('#content').find('h1').find('span')[1].children[0].data;
+        } catch (error) {
+
+        }
+        return year;
     }
     // Parse Image
     async parse_image(cheerioModel) {

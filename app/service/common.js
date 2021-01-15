@@ -30,7 +30,6 @@ class CommonService extends Service {
             'Referer': 'https://www.douban.com',
             'Cookie': 'bid=L-u7svjqTFE; ll="118159"'
         }
-        console.log(headers)
         let options = {
             headers,
         }
